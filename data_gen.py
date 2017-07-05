@@ -13,7 +13,7 @@ def place_cube(matrix, origin, r):
     ] = 1
     return matrix
 
-def dist(x, y):
+def dist3D(x, y):
     return math.sqrt(
         (x[0]-y[0])**2+
         (x[1]-y[1])**2+
@@ -22,11 +22,49 @@ def dist(x, y):
 
 def place_sphere(matrix, origin, r):
     for index, x in np.ndenumerate(matrix):
-        if dist(index, origin) <= r:
+        if dist3D(index, origin) <= r:
             matrix[index] = 1
     return matrix
 
-def random_shapes(m_size,num):
+# data generating script
+def place_square(matrix, origin, r):
+    #dim = matrix.shape()
+    matrix[
+    origin[0]-r:origin[0]+r,
+    origin[1]-r:origin[1]+r,
+    ] = 1
+    return matrix
+
+def dist2D(x, y):
+    return math.sqrt(
+        (x[0]-y[0])**2+
+        (x[1]-y[1])**2
+        )
+
+def place_circle(matrix, origin, r):
+    for index, x in np.ndenumerate(matrix):
+        if dist2D(index, origin) <= r:
+            matrix[index] = 1
+    return matrix
+
+def random_3D_shapes(m_size,num):
+    shapes = np.zeros((m_size,m_size,m_size,num))
+    labels = np.zeros((2,num))
+    shape_types = np.random.randint(low = 0,high = 2,size= num)
+    
+    for i in range(num):
+        r = np.random.randint(low = 3,high = np.floor(m_size/2-1))
+        org = np.random.randint(low = r + 1,high = m_size - r - 1, size = 3)
+        if shape_types[i] == 0:
+            shapes[:,:,:,i] = place_cube(shapes[:,:,:,i],org,r)
+            labels[0,i] = 1
+        elif shape_types[i] == 1:
+            shapes[:,:,:,i] = place_sphere(shapes[:,:,:,i],org,r)
+            labels[1,i] = 1
+            
+    return shapes, labels
+
+def random_2D_shapes(m_size,num):
     shapes = np.zeros((m_size,m_size,m_size,num))
     shape_types = np.random.randint(low = 0,high = 2,size= num)
     
@@ -41,7 +79,7 @@ def random_shapes(m_size,num):
     return shapes, shape_types
         
 
-def matching_shapes(m_size, num):
+def matching_3D_shapes(m_size, num):
     cubes = np.zeros((m_size,m_size,m_size,num))
     spheres = np.zeros((m_size,m_size,m_size,num))
     for i in range(num):
